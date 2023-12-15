@@ -50,7 +50,18 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
+//Structural
+const App = () => {
+  return (
+    <>
+      <NavBar />
+      <Main />
+    </>
+  );
+};
+
 //NAVBAR
+//Structural
 const NavBar = () => {
   return (
     <nav className="nav-bar">
@@ -61,6 +72,7 @@ const NavBar = () => {
   );
 };
 
+//Presentational
 const Logo = () => {
   return (
     <div className="logo">
@@ -70,6 +82,7 @@ const Logo = () => {
   );
 };
 
+//Stateful
 const Search = () => {
   const [query, setQuery] = useState("");
 
@@ -84,6 +97,7 @@ const Search = () => {
   );
 };
 
+//Presentational
 const NumResults = () => {
   return (
     <p className="num-results">
@@ -93,6 +107,7 @@ const NumResults = () => {
 };
 
 //MAIN
+//Structural
 const Main = () => {
   return (
     <main className="main">
@@ -103,6 +118,7 @@ const Main = () => {
 };
 
 //LEFT HAND SIDE - LIST BOX
+//Stateful
 const ListBox = () => {
   const [isOpen1, setIsOpen1] = useState(true);
 
@@ -119,6 +135,7 @@ const ListBox = () => {
   );
 };
 
+//Stateful
 const MovieList = () => {
   const [movies, setMovies] = useState(tempMovieData);
 
@@ -131,6 +148,7 @@ const MovieList = () => {
   );
 };
 
+//Presentational
 const Movie = ({ movie }) => {
   return (
     <li>
@@ -147,6 +165,7 @@ const Movie = ({ movie }) => {
 };
 
 //RIGHT HAND SIDE - WATCHED BOX
+//Stateful
 const WatchedBox = () => {
   const [watched, setWatched] = useState(tempWatchedData);
   const [isOpen2, setIsOpen2] = useState(true);
@@ -169,6 +188,7 @@ const WatchedBox = () => {
   );
 };
 
+//Presentational
 const WatchedSummary = ({ watched }) => {
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
   const avgUserRating = average(watched.map((movie) => movie.userRating));
@@ -199,6 +219,7 @@ const WatchedSummary = ({ watched }) => {
   );
 };
 
+//Presentational
 const WatchedMovieList = ({ watched }) => {
   return (
     <ul className="list">
@@ -209,6 +230,7 @@ const WatchedMovieList = ({ watched }) => {
   );
 };
 
+//Presentational
 const WatchedMovie = ({ movie }) => {
   return (
     <li>
@@ -232,11 +254,4 @@ const WatchedMovie = ({ movie }) => {
   );
 };
 
-export default function App() {
-  return (
-    <>
-      <NavBar />
-      <Main />
-    </>
-  );
-}
+export default App;
