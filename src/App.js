@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const tempMovieData = [
   {
@@ -57,10 +57,12 @@ const App = () => {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
 
-  fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=godzilla`)
-    .then((res) => res.json())
-    .then((data) => console.log(data.Search))
-    .catch((err) => console.log('Error:', err));
+  useEffect(() => {
+    fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=godzilla`)
+      .then((res) => res.json())
+      .then((data) => setMovies(data.Search))
+      .catch((err) => console.log('Error:', err));
+  }, []);
 
   return (
     <>
