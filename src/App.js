@@ -66,12 +66,19 @@ const App = () => {
   // }, []);
   useEffect(() => {
     const fetchMovies = async () => {
-      const res = await fetch(
-        `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-      );
-      const data = await res.json();
-      setMovies(data.Search);
-      console.log(data.Search);
+      try {
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+        );
+        if (!res.ok) {
+          throw new Error(`Error: ${res.status}: ${res.statusText}`);
+        }
+        const data = await res.json();
+        setMovies(data.Search);
+        console.log(data.Search);
+      } catch (err) {
+        console.error('Error fetching movies:', err);
+      }
     };
 
     fetchMovies();
