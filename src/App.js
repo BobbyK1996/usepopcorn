@@ -56,6 +56,7 @@ const KEY = 'a12b7d00';
 const App = () => {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const query = 'godzilla';
 
   // useEffect(() => {
@@ -67,6 +68,7 @@ const App = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
+        setIsLoading(true);
         const res = await fetch(
           `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
         );
@@ -75,7 +77,7 @@ const App = () => {
         }
         const data = await res.json();
         setMovies(data.Search);
-        console.log(data.Search);
+        setIsLoading(false);
       } catch (err) {
         console.error('Error fetching movies:', err);
       }
@@ -91,9 +93,7 @@ const App = () => {
         <NumResults movies={movies} />
       </NavBar>
       <Main>
-        <Box>
-          <MovieList movies={movies} />
-        </Box>
+        <Box>{isLoading ? <Loader /> : <MovieList movies={movies} />}</Box>
         <Box>
           <WatchedSummary watched={watched} />
           <WatchedMovieList watched={watched} />
@@ -101,6 +101,10 @@ const App = () => {
       </Main>
     </>
   );
+};
+
+const Loader = () => {
+  return <p className="loader">Loading...</p>;
 };
 
 //NAVBAR
