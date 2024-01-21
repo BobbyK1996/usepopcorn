@@ -56,12 +56,25 @@ const KEY = 'a12b7d00';
 const App = () => {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
+  const query = 'godzilla';
 
+  // useEffect(() => {
+  //   fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=godzilla`)
+  //     .then((res) => res.json())
+  //     .then((data) => setMovies(data.Search))
+  //     .catch((err) => console.log('Error:', err));
+  // }, []);
   useEffect(() => {
-    fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=godzilla`)
-      .then((res) => res.json())
-      .then((data) => setMovies(data.Search))
-      .catch((err) => console.log('Error:', err));
+    const fetchMovies = async () => {
+      const res = await fetch(
+        `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+      );
+      const data = await res.json();
+      setMovies(data.Search);
+      console.log(data.Search);
+    };
+
+    fetchMovies();
   }, []);
 
   return (
