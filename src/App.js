@@ -54,12 +54,11 @@ const KEY = 'a12b7d00';
 
 //Structural
 const App = () => {
+  const [query, setQuery] = useState('Inception');
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const QUERY = 'interstellar';
 
   // useEffect(() => {
   //   fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=godzilla`)
@@ -71,9 +70,10 @@ const App = () => {
     const fetchMovies = async () => {
       try {
         setIsLoading(true);
+        setError('');
         const res = await fetch(
           // `http://www.omdbapi.com/?apikey=${KEY}&s=${QUERY}`
-          `http://www.omdbapi.com/?apikey=${KEY}&s=${QUERY}`
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
         );
 
         if (!res.ok) {
@@ -86,7 +86,6 @@ const App = () => {
         }
 
         setMovies(data.Search);
-        console.log(data);
       } catch (err) {
         console.error('Error fetching movies:', err.message);
         setError(err.message);
@@ -95,13 +94,19 @@ const App = () => {
       }
     };
 
+    if (query.length < 3) {
+      setMovies([]);
+      setError('');
+      return;
+    }
+
     fetchMovies();
-  }, []);
+  }, [query]);
 
   return (
     <>
       <NavBar>
-        <Search />
+        <Search query={query} setQuery={setQuery} />
         <NumResults movies={movies} />
       </NavBar>
       <Main>
@@ -153,9 +158,7 @@ const Logo = () => {
 };
 
 //Stateful
-const Search = () => {
-  const [query, setQuery] = useState('');
-
+const Search = ({ query, setQuery }) => {
   return (
     <input
       className="search"
