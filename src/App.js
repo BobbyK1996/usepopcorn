@@ -59,7 +59,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const query = 'godzilla';
+  const QUERY = 'godzilla';
 
   // useEffect(() => {
   //   fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=godzilla`)
@@ -72,13 +72,20 @@ const App = () => {
       try {
         setIsLoading(true);
         const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${QUERY}`
         );
+
         if (!res.ok) {
           throw new Error(`Error: ${res.status}: ${res.statusText}`);
         }
+
         const data = await res.json();
+        if (data.Response === 'False') {
+          throw new Error('Movie not found');
+        }
+
         setMovies(data.Search);
+        console.log(data);
       } catch (err) {
         console.error('Error fetching movies:', err.message);
         setError(err.message);
