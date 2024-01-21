@@ -59,7 +59,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const QUERY = 'godzilla';
+  const QUERY = 'interstellar';
 
   // useEffect(() => {
   //   fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=godzilla`)
@@ -72,6 +72,7 @@ const App = () => {
       try {
         setIsLoading(true);
         const res = await fetch(
+          // `http://www.omdbapi.com/?apikey=${KEY}&s=${QUERY}`
           `http://www.omdbapi.com/?apikey=${KEY}&s=${QUERY}`
         );
 
@@ -104,10 +105,9 @@ const App = () => {
         <NumResults movies={movies} />
       </NavBar>
       <Main>
-        {/* <Box>{isLoading ? <Loader /> : <MovieList movies={movies} />}</Box> */}
         <Box>
           {isLoading && <Loader />}
-          {isLoading && !error && <MovieList movies={movies} />}
+          {!isLoading && !error && <MovieList movies={movies} />}
           {error && <ErrorMessage message={error} />}
         </Box>
         <Box>
