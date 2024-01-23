@@ -234,6 +234,7 @@ const MovieDetails = ({ selectedId, onCloseMovie, onAddWatched }) => {
       poster,
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(' ').at(0)),
+      userRating,
     };
 
     onAddWatched(newWatchedMovie);
@@ -288,9 +289,11 @@ const MovieDetails = ({ selectedId, onCloseMovie, onAddWatched }) => {
                 onSetRating={setUserRating}
               />
 
-              <button className="btn-add" onClick={handleAdd}>
-                + Add to list
-              </button>
+              {userRating > 0 && (
+                <button className="btn-add" onClick={handleAdd}>
+                  + Add to list
+                </button>
+              )}
             </div>
             <p>
               <em>{plot}</em>
