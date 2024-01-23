@@ -9,7 +9,7 @@ const KEY = 'a12b7d00';
 
 //Structural
 const App = () => {
-  const [query, setQuery] = useState('Inception');
+  const [query, setQuery] = useState('');
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -61,7 +61,7 @@ const App = () => {
       setError('');
     } catch (err) {
       if (err.name !== 'AbortError') {
-        console.error('Error fetching movies:', err.message);
+        console.log('Error fetching movies:', err.message);
         setError(err.message);
       }
     } finally {
@@ -81,6 +81,8 @@ const App = () => {
     controller.abort();
 
     controller = new AbortController();
+
+    handleCloseMovie();
 
     debouncedFetchMovies(query);
 
