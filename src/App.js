@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import StarRating from './StarRating';
 
 const average = (arr) =>
-  arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
+  arr.reduce((acc, cur, i, arr) => acc + (Number(cur) || 0) / arr.length, 0);
 
 const KEY = 'a12b7d00';
 
@@ -211,6 +211,7 @@ const Movie = ({ movie, onSelectMovie }) => {
 const MovieDetails = ({ selectedId, onCloseMovie, onAddWatched }) => {
   const [movie, setMovie] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [userRating, setUserRating] = useState('');
 
   const {
     Title: title,
@@ -236,6 +237,7 @@ const MovieDetails = ({ selectedId, onCloseMovie, onAddWatched }) => {
     };
 
     onAddWatched(newWatchedMovie);
+    onCloseMovie();
   };
 
   useEffect(() => {
@@ -280,7 +282,11 @@ const MovieDetails = ({ selectedId, onCloseMovie, onAddWatched }) => {
 
           <section>
             <div className="rating">
-              <StarRating maxRating={10} size={24} />
+              <StarRating
+                maxRating={10}
+                size={24}
+                onSetRating={setUserRating}
+              />
 
               <button className="btn-add" onClick={handleAdd}>
                 + Add to list
