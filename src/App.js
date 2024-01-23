@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import debounce from 'lodash/debounce';
 import StarRating from './StarRating';
 
 const average = (arr) =>
@@ -7,6 +8,80 @@ const average = (arr) =>
 const KEY = 'a12b7d00';
 
 //Structural
+// const App = () => {
+//   const [query, setQuery] = useState('Inception');
+//   const [movies, setMovies] = useState([]);
+//   const [watched, setWatched] = useState([]);
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [error, setError] = useState('');
+//   const [selectedId, setSelectedId] = useState(null);
+
+//   // useEffect(() => {
+//   //   fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=godzilla`)
+//   //     .then((res) => res.json())
+//   //     .then((data) => setMovies(data.Search))
+//   //     .catch((err) => console.log('Error:', err));
+//   // }, []);
+//   const handleSelectMovie = (id) => {
+//     setSelectedId((selectedId) => (id === selectedId ? null : id));
+//   };
+//   const handleCloseMovie = () => {
+//     setSelectedId(null);
+//   };
+
+//   const handleAddWatch = (movie) => {
+//     setWatched((watched) => [...watched, movie]);
+//   };
+
+//   const handleDeleteWatched = (id) => {
+//     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
+//   };
+
+//   useEffect(() => {
+//     const controller = new AbortController();
+
+//     const fetchMovies = async () => {
+//       try {
+//         setIsLoading(true);
+//         setError('');
+//         const res = await fetch(
+//           `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+//           { signal: controller.signal }
+//         );
+
+//         if (!res.ok) {
+//           throw new Error(`Error: ${res.status}: ${res.statusText}`);
+//         }
+
+//         const data = await res.json();
+//         if (data.Response === 'False') {
+//           throw new Error('Movie not found');
+//         }
+
+//         setMovies(data.Search);
+//         setError('');
+//       } catch (err) {
+//         if (err.name !== 'AbortError') {
+//           console.error('Error fetching movies:', err.message);
+//           setError(err.message);
+//         }
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     };
+
+//     if (query.length < 3) {
+//       setMovies([]);
+//       setError('');
+//       return;
+//     }
+
+//     fetchMovies();
+
+//     return () => {
+//       controller.abort();
+//     };
+//   }, [query]);
 const App = () => {
   const [query, setQuery] = useState('Inception');
   const [movies, setMovies] = useState([]);
@@ -36,51 +111,58 @@ const App = () => {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   };
 
-  useEffect(() => {
-    const controller = new AbortController();
+  let controller = new AbortController();
 
-    const fetchMovies = async () => {
-      try {
-        setIsLoading(true);
-        setError('');
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-          { signal: controller.signal }
-        );
+  const fetchMovies = async (searchQuery) => {
+    try {
+      setIsLoading(true);
+      setError('');
+      const res = await fetch(
+        `http://www.omdbapi.com/?apikey=${KEY}&s=${searchQuery}`,
+        { signal: controller.signal }
+      );
 
-        if (!res.ok) {
-          throw new Error(`Error: ${res.status}: ${res.statusText}`);
-        }
-
-        const data = await res.json();
-        if (data.Response === 'False') {
-          throw new Error('Movie not found');
-        }
-
-        setMovies(data.Search);
-        setError('');
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error('Error fetching movies:', err.message);
-          setError(err.message);
-        }
-      } finally {
-        setIsLoading(false);
+      if (!res.ok) {
+        throw new Error(`Error: ${res.status}: ${res.statusText}`);
       }
-    };
 
+      const data = await res.json();
+      if (data.Response === 'False') {
+        throw new Error('Movie not found');
+      }
+
+      setMovies(data.Search);
+      setError('');
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        console.error('Error fetching movies:', err.message);
+        setError(err.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const debouncedFetchMovies = useCallback(debounce(fetchMovies, 300), []);
+
+  useEffect(() => {
     if (query.length < 3) {
       setMovies([]);
       setError('');
       return;
     }
 
-    fetchMovies();
+    controller.abort();
+
+    controller = new AbortController();
+
+    debouncedFetchMovies(query);
 
     return () => {
       controller.abort();
+      controller = new AbortController();
     };
-  }, [query]);
+  }, [query, debouncedFetchMovies]);
 
   return (
     <>
@@ -122,6 +204,23 @@ const App = () => {
     </>
   );
 };
+
+// const debouncedFetchMovies = useCallback(debounce(fetchMovies, 300), []);
+
+// useEffect(() => {
+//   if (query.length > 3) {
+//     controller.abort();
+
+//     controller = new AbortController();
+
+//     debouncedFetchMovies(query);
+//   } else {
+//     setMovies([]);
+//     setError('');
+//   }
+
+//   return () => controller.abort();
+// }, [query, debouncedFetchMovies]);
 
 const Loader = () => {
   return <p className="loader">Loading...</p>;
