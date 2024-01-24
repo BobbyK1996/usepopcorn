@@ -32,6 +32,8 @@ const App = () => {
 
   const handleAddWatch = (movie) => {
     setWatched((watched) => [...watched, movie]);
+
+    localStorage.setItem('watched', JSON.stringify([...watched, movie]));
   };
 
   const handleDeleteWatched = (id) => {
