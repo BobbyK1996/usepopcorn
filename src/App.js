@@ -11,7 +11,10 @@ const KEY = 'a12b7d00';
 const App = () => {
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(() => {
+    const storedValues = localStorage.getItem('watched');
+    return JSON.parse(storedValues);
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedId, setSelectedId] = useState(null);
