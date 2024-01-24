@@ -7,8 +7,6 @@ const average = (arr) =>
 
 const KEY = 'a12b7d00';
 
-console.log(KEY);
-
 //Structural
 const App = () => {
   const [query, setQuery] = useState('');
