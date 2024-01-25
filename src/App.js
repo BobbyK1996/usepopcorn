@@ -196,9 +196,23 @@ const Logo = () => {
 //Stateful
 const Search = ({ query, setQuery }) => {
   const searchInputEl = useRef(null);
+
   useEffect(() => {
     searchInputEl.current.focus();
-  }, []);
+
+    const callback = (e) => {
+      if (document.activeElement === searchInputEl.current) return;
+
+      if (e.code === 'Enter') {
+        searchInputEl.current.focus();
+        setQuery('');
+      }
+    };
+
+    document.addEventListener('keydown', callback);
+
+    return () => document.addEventListener('keydown', callback);
+  }, [setQuery]);
 
   return (
     <input
