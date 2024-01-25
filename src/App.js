@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 import StarRating from './StarRating';
 
@@ -195,9 +195,9 @@ const Logo = () => {
 
 //Stateful
 const Search = ({ query, setQuery }) => {
+  const searchInputEl = useRef(null);
   useEffect(() => {
-    const searchBarEl = document.querySelector('.search');
-    searchBarEl.focus();
+    searchInputEl.current.focus();
   }, []);
 
   return (
@@ -207,6 +207,7 @@ const Search = ({ query, setQuery }) => {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={searchInputEl}
     />
   );
 };
