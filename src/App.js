@@ -195,6 +195,11 @@ const Logo = () => {
 
 //Stateful
 const Search = ({ query, setQuery }) => {
+  useEffect(() => {
+    const searchBarEl = document.querySelector('.search');
+    searchBarEl.focus();
+  }, []);
+
   return (
     <input
       className="search"
