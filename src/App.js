@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import StarRating from './StarRating';
+import { useLocalStorageState } from './useLocalStorageState';
 import { useMovies } from './useMovies';
 
 const average = (arr) =>
@@ -10,11 +11,13 @@ const KEY = 'a12b7d00';
 //Structural
 const App = () => {
   const [query, setQuery] = useState('');
-  const [watched, setWatched] = useState(() => {
-    const storedValues = localStorage.getItem('watched');
-    return JSON.parse(storedValues);
-  });
+  // const [watched, setWatched] = useState(() => {
+  //   const storedValues = localStorage.getItem('watched');
+  //   return JSON.parse(storedValues);
+  // });
   const [selectedId, setSelectedId] = useState(null);
+
+  const [watched, setWatched] = useLocalStorageState([], 'watched');
 
   // useEffect(() => {
   //   fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=godzilla`)
@@ -39,10 +42,6 @@ const App = () => {
   const handleDeleteWatched = (id) => {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   };
-
-  useEffect(() => {
-    localStorage.setItem('watched', JSON.stringify(watched));
-  }, [watched]);
 
   return (
     <>
