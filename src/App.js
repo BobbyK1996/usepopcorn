@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import debounce from 'lodash/debounce';
+import { useEffect, useRef, useState } from 'react';
 import StarRating from './StarRating';
+import { useMovies } from './useMovies';
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + (Number(cur) || 0) / arr.length, 0);
@@ -10,13 +10,10 @@ const KEY = 'a12b7d00';
 //Structural
 const App = () => {
   const [query, setQuery] = useState('');
-  const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(() => {
     const storedValues = localStorage.getItem('watched');
     return JSON.parse(storedValues);
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const [selectedId, setSelectedId] = useState(null);
 
   // useEffect(() => {
@@ -33,10 +30,10 @@ const App = () => {
     setSelectedId(null);
   };
 
+  const { movies, isLoading, error } = useMovies(query, handleCloseMovie);
+
   const handleAddWatch = (movie) => {
     setWatched((watched) => [...watched, movie]);
-
-    // localStorage.setItem('watched', JSON.stringify([...watched, movie]));
   };
 
   const handleDeleteWatched = (id) => {
@@ -47,65 +44,14 @@ const App = () => {
     localStorage.setItem('watched', JSON.stringify(watched));
   }, [watched]);
 
-  let controller = new AbortController();
-
-  const fetchMovies = async (searchQuery) => {
-    try {
-      setIsLoading(true);
-      setError('');
-      const res = await fetch(
-        `http://www.omdbapi.com/?apikey=${KEY}&s=${searchQuery}`,
-        { signal: controller.signal }
-      );
-
-      if (!res.ok) {
-        throw new Error(`Error: ${res.status}: ${res.statusText}`);
-      }
-
-      const data = await res.json();
-      if (data.Response === 'False') {
-        throw new Error('Movie not found');
-      }
-
-      setMovies(data.Search);
-      setError('');
-    } catch (err) {
-      if (err.name !== 'AbortError') {
-        console.log('Error fetching movies:', err.message);
-        setError(err.message);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const debouncedFetchMovies = useCallback(debounce(fetchMovies, 300), []);
-
-  useEffect(() => {
-    if (query.length < 3) {
-      setMovies([]);
-      setError('');
-      return;
-    }
-
-    controller.abort();
-
-    controller = new AbortController();
-
-    handleCloseMovie();
-
-    debouncedFetchMovies(query);
-
-    return () => {
-      controller.abort();
-      controller = new AbortController();
-    };
-  }, [query, debouncedFetchMovies]);
-
   return (
     <>
       <NavBar>
-        <Search query={query} setQuery={setQuery} />
+        <Search
+          query={query}
+          setQuery={setQuery}
+          onCloseMovie={handleCloseMovie}
+        />
         <NumResults movies={movies} />
       </NavBar>
       <Main>
@@ -143,23 +89,6 @@ const App = () => {
   );
 };
 
-// const debouncedFetchMovies = useCallback(debounce(fetchMovies, 300), []);
-
-// useEffect(() => {
-//   if (query.length > 3) {
-//     controller.abort();
-
-//     controller = new AbortController();
-
-//     debouncedFetchMovies(query);
-//   } else {
-//     setMovies([]);
-//     setError('');
-//   }
-
-//   return () => controller.abort();
-// }, [query, debouncedFetchMovies]);
-
 const Loader = () => {
   return <p className="loader">Loading...</p>;
 };
@@ -194,7 +123,7 @@ const Logo = () => {
 };
 
 //Stateful
-const Search = ({ query, setQuery }) => {
+const Search = ({ query, setQuery, onCloseMovie }) => {
   const searchInputEl = useRef(null);
 
   useEffect(() => {
@@ -205,13 +134,14 @@ const Search = ({ query, setQuery }) => {
 
       if (e.code === 'Enter') {
         searchInputEl.current.focus();
+        onCloseMovie();
         setQuery('');
       }
     };
 
     document.addEventListener('keydown', callback);
 
-    return () => document.addEventListener('keydown', callback);
+    return () => document.removeEventListener('keydown', callback);
   }, [setQuery]);
 
   return (
